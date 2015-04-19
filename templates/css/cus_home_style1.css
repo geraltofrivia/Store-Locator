@@ -1319,6 +1319,19 @@ body{
 	-ms-background-size: cover;
 	-moz-background-size: cover;
 	min-height:840px;
+	position: relative;
+	z-index: 16;
+	}
+.banner:after{
+		content:"";
+		background: black;
+		opacity: 0.5;
+		top: 0;
+		bottom: 0;
+		right: 0;
+		left: 0;
+		position: absolute;
+		z-index: -1;
 	}
 .banner-info{
 margin-top:266px;

@@ -19,7 +19,7 @@
 		<script type="text/javascript" src="js/cus_home_easing1.js"></script>
 		<script type="text/javascript">
 			jQuery(document).ready(function($) {
-				$(".scroll").click(function(event){		
+				$(".scroll").click(function(event){
 					event.preventDefault();
 					$('html,body').animate({scrollTop:$(this.hash).offset().top},1000);
 				});
@@ -35,9 +35,9 @@
 		<div class="banner-info">
 			<h1 >Welcome to StoreLocator</h1>
 			<p>Looking for some products?</p>
-			<div class="view"><a href="#">Search Store</a></div>
+			
 		</div>
-		
+
 	</div>
 </div>
 <!-- //banner -->
@@ -45,20 +45,18 @@
 <div class="navigation">
 	<div class="container">
 		<div class="fixed-header">
-			<div class="nav-left">
-				<a href="#"><img "="" logo.png"="" alt=""></a>
-			</div>
-			<div class="nav-right">
-				<span class="menu"><img src="images/cus_home_images/menu.png" alt=""></span>
+		
+			<div class="nav-right" >
+				
 					<nav class="cl-effect-1">
 						<ul class="nav1">
 							<li><a class="scroll" href="#home">Home</a></li>
                             <li><a href="/shop/">ShopKeeper</a></li>
 							</ul>
 					</nav>
-					
+
 					<!-- script for menu -->
-					<script> 
+					<script>
 						$( "span.menu" ).click(function() {
 						$( "ul.nav1" ).slideToggle( 300, function() {
 						 // Animation complete.
@@ -71,14 +69,14 @@
 						$(document).ready(function() {
 							 var navoffeset=$(".navigation").offset().top;
 							 $(window).scroll(function(){
-								var scrollpos=$(window).scrollTop(); 
+								var scrollpos=$(window).scrollTop();
 								if(scrollpos >=navoffeset){
 									$(".navigation").addClass("fixed");
 								}else{
 									$(".navigation").removeClass("fixed");
 								}
 							 });
-							 
+
 						});
 						</script>
 					<!-- /script-for sticky-nav -->
@@ -98,7 +96,7 @@
 				<div class="block">
 					<input placeholder="Enter your password here" name="password" type="password">
 				</div>
-					<input onclick="myFunction()" value="LOG IN" type="submit" > 
+					<input onclick="myFunction()" value="LOG IN" type="submit" >
                     {%if error%}
                     <div class="alert alert-danger" role="alert">
                     <span class="sr-only">Error:</span>
@@ -107,7 +105,7 @@
                 </div>
                 {%endif%}
                 </form>
-					
+
             <div class="block" >
                         <a href="/registration" style="font-size: 30px;
                             font-weight: 600;
@@ -119,14 +117,14 @@
                             border: medium none;
                             outline: medium none;">SIGN UP</a>
                     </div>
-			
-			
+                    <br><br><br><br><br><br>
+
 		</div>
 		</div>
 
-	
 
-	
+
+
 
 
 
@@ -137,7 +135,7 @@
 		<div class="footer-left">
 			<p>Website By Team 23</p>
 		</div>
-		
+
 		<div class="clearfix"></div>
 	</div>
 </div>
@@ -150,9 +148,9 @@
 			containerID: 'toTop', // fading element id
 			containerHoverID: 'toTopHover', // fading element hover id
 			scrollSpeed: 1200,
-			easingType: 'linear' 
+			easingType: 'linear'
 			};
-		*/								
+		*/
 		$().UItoTop({ easingType: 'easeOutQuart' });
 		});
 	</script>

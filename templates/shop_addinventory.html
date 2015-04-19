@@ -17,7 +17,7 @@
     <link href="/css/shop_profile_custom.css" rel="stylesheet" />
      <!-- GOOGLE FONTS-->
    <link href='http://fonts.googleapis.com/css?family=Open+Sans' rel='stylesheet' type='text/css' />
-   <link href="/css/cust_search_bootstrap.css" rel="stylesheet" type="text/css">
+   
 <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
 <script src="/js/cust_search_jquery.min.js"></script>
 <!-- Custom Theme files -->
@@ -75,11 +75,17 @@ font-size: 16px;"> <a href="/shop/logout?url=/shop" class="btn btn-danger square
                     </div>
 
                         <span class="input-group-btn">
-                        <button class="btn btn-default" type="button">Go!</button>
+                        <button class="btn btn-default btn-lg" type="submit">Search!</button>
                         </span>
 
                     </div>
                  </form>
+                    {%if error%}
+              <div class="alert alert-warning" role="alert">
+              <span class="sr-only">Error:</span>
+                  {{error}}
+                </div>
+                 {%endif%}
 
                 <br>
                 <div> <button  class="btn btn-primary btn-block">CATEGORIES</button></div>
@@ -109,17 +115,14 @@ font-size: 16px;"> <a href="/shop/logout?url=/shop" class="btn btn-danger square
              <div class="view1 view-fifth1">
               <div class="top_box">
               <h3 class="m_1">{{products[i].name}}</h3>
-              <p class="m_2">Category</p>
-            <a href="single.html">
+              
                  <div class="grid_img">
                <div class="css3"><img src="/images/cust_search_images/pic-5.jpg" alt=""></div>
-                    <div class="mask1">
-                            <div class="info">Quick View</div>
-                        </div>
+                    
                       </div>
-                       <div class="price">price</div>
-             </a></div><a href="single.html">
-              </a></div>
+                       
+             </div>
+              </div>
             <div class="rtng">
 
                  <fieldset>
@@ -142,17 +145,14 @@ font-size: 16px;"> <a href="/shop/logout?url=/shop" class="btn btn-danger square
              <div class="view1 view-fifth1">
               <div class="top_box">
               <h3 class="m_1">{{products[i+1].name}}</h3>
-              <p class="m_2">Category</p>
-            <a href="single.html">
+              
                  <div class="grid_img">
                <div class="css3"><img src="/images/cust_search_images/pic-5.jpg" alt=""></div>
-                    <div class="mask1">
-                            <div class="info">Quick View</div>
-                        </div>
+                    
                       </div>
-                       <div class="price">price</div>
-             </a></div><a href="single.html">
-              </a></div>
+                       
+             </div>
+            </div>
             <div class="rtng">
 
                  <fieldset>
@@ -174,17 +174,14 @@ font-size: 16px;"> <a href="/shop/logout?url=/shop" class="btn btn-danger square
              <div class="view1 view-fifth1">
               <div class="top_box">
               <h3 class="m_1">{{products[i+2].name}}</h3>
-              <p class="m_2">Category</p>
-            <a href="single.html">
+          
                  <div class="grid_img">
                <div class="css3"><img src="/images/cust_search_images/pic-5.jpg" alt=""></div>
-                    <div class="mask1">
-                            <div class="info">Quick View</div>
-                        </div>
+                    
                       </div>
-                       <div class="price">price</div>
-             </a></div><a href="single.html">
-              </a></div>
+                       
+             </div>
+            </div>
             <div class="rtng">
 
                  <fieldset>
@@ -205,7 +202,7 @@ font-size: 16px;"> <a href="/shop/logout?url=/shop" class="btn btn-danger square
        </div>
         {%endfor%}
         <input type="hidden" value = {{products|length}} name = "length">
-        <input type="Submit">
+        <input type="Submit" class="btn btn-danger square-btn-adjust btn-group-lg" value = "add">
       </form>
   </div>
 

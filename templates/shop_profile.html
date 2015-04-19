@@ -59,18 +59,55 @@ font-size: 16px;"> <a href="/shop/logout?url=/shop" class="btn btn-danger square
         <div id="page-wrapper" >
             <div id="page-inner">
                 <div class="row">
-                    <div class="col-md-12">
+                    <div class="col-md-8">
                      <h2>{{fname}}</h2>
                         <h5>Welcome {{fname}}, Love to see you back. </h5>
+                        {%if open == 'True'%}
+                        <h5>Your shop is currently open.</h5>
+                        {%endif%}
+                    </div>
+                    <div class="col-md-2">
+                      <form action="/shop/openclose">
+                        <input type="radio" name="switch" value="open">Open<br>
+                        <input type="radio" name="switch" value="close">Close<br>
+                      </div>
+                      <div class="col-md-2">
+                        <input type="submit" value="Submit">
+                      </form>
+                </div>
 
+                  <div class="row">
+                    <div class="col-md-12">
+                        {%if error_verified%}
+                            <div class="alert alert-warning" role="alert">
+                            <span class="sr-only">Error:</span>
+                                {{error_verified}}
+                            </div>
+                        {%endif%} 
                     </div>
                 </div>
+
+                <div class="row">
+                    <div class="col-md-12">
+                        {%if error_location%}
+                            <div class="alert alert-warning" role="alert">
+                            <span class="sr-only">Error:</span>
+                                {{error_location}}
+                            </div>
+                        {%endif%} 
+                    </div>
+                </div>
+
+              </div>
                  <!-- /. ROW  -->
                  <hr />
                               <!-- Advanced Tables -->
                     <div class="panel panel-default">
+                        
+                         <form method="post">        <!-- Advanced Tables -->
+                    <div class="panel panel-default">
                         <div class="panel-heading">
-                             Current Inventory
+                             Current Inventory List
                         </div>
                         <div class="panel-body">
                             <div class="table-responsive">
@@ -81,15 +118,17 @@ font-size: 16px;"> <a href="/shop/logout?url=/shop" class="btn btn-danger square
                                             <th>Brand</th>
                                             <th>Description</th>
                                             <th>Category</th>
+                                            <th>Remove</th>
                                         </tr>
                                     </thead>
                                     <tbody>
                                         {%for i in range(products|length) %}
-                                        <tr>
-                                        <td>{{products[i][0].name}}</td>
+                                       <tr >
+                                        <td> {{products[i][0].name}}</td>
                                         <td>{{products[i][0].brand}}</td>
                                         <td>{{products[i][0].description}}</td>
                                         <td>{{products[i][1].name}}</td>
+                                        <td><input type="checkbox" value="{{products[i][0].key.id()}}" name={{i}}></td>
                                         {%endfor%}                                        
                                     </tbody>
                                 </table>
@@ -97,9 +136,12 @@ font-size: 16px;"> <a href="/shop/logout?url=/shop" class="btn btn-danger square
 
                         </div>
                     </div>
+                    <input type="hidden" value = {{products|length}} name = "length">
+                     <input type="submit" class="btn btn square-btn-adjust" style="background-color:#D9534F" value="Delete Items">
+                </form>
                     <!--End Advanced Tables -->
 
-<p>
+                        <p>
                             <a class="btn btn-danger square-btn-adjust" role="button" style="" href="/shop/addinventory">Add More</a>
                         </p>
 

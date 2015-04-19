@@ -14,6 +14,10 @@ class Categories(ndb.Model):
 
 	@classmethod
 	def populate(self):
+		query = Categories.query().fetch()
+		if len(query) > 0:
+			return False
+
 		products = catalogue.getCategories()
 		for product in products:
 			_name = product[0]			#The product name is supposed to be unique. ASSUMED!
@@ -180,6 +184,10 @@ class Products(ndb.Model):
 
 	@classmethod
 	def populate(self):
+		query = Products.query().fetch()
+		if len(query) > 0:
+			return False
+
 		products = catalogue.getProducts()
 		for product in products:
 			#print product
@@ -588,6 +596,9 @@ class Users(ndb.Model):
 			for k in user.shopping_list:
 				products.append(Products.get_by_id(k))
 
+			return products
+		return []
+
 	@classmethod
 	def updateLocation(self,_latitude,_longitude,_user):
 		#Expects float lat and long. And expects valid key id
@@ -615,19 +626,34 @@ class Shops(ndb.Model):
 	inventory_archived =  ndb.KeyProperty(kind = Products, repeated = True)
 	active_sessions = ndb.PickleProperty(repeated = True)
 	open = ndb.BooleanProperty()
+	verified = ndb.BooleanProperty()
 
 	#Register function
 	@classmethod
 	def register(self,_email,_fname,_lname,_password,_mobile,_shop_name,_shop_address):
 		#Assumes verified values
 		if self.shopExists(_shop_name,_email):
-			entity = Shops(fname = _fname, lname = _lname, email = _email, password = _password, mobile = _mobile, shop_name = _shop_name, shop_address = _shop_address)
+			
+			entity = Shops(fname = _fname, lname = _lname, email = _email, password = _password, mobile = _mobile, shop_name = _shop_name, shop_address = _shop_address, verified = False)
 			entity.put()
+			Verification.new_pending_shop(entity)
 			print "shopdb: register: ", entity
 			return (0,'Success')
 		else:
 			print "User already exists"
 			return (-1,'This shop already exists')
+
+	@classmethod
+	def fetch_by_id(self, id):
+		query = Shops.query()
+		for q in query:
+			if str(q.key.id()) == str(id):
+				return q
+
+	@classmethod
+	def get_shop_by_url(self, url):
+		rev_key = ndb.Key(urlsafe=urlString)
+		return rev_key.get()
 
 	@classmethod
 	def open_shop(self,_shop):
@@ -864,3 +890,28 @@ class Shops(ndb.Model):
 				break
 
 		return result
+
+class Verification(ndb.Model):
+	shop = ndb.KeyProperty(kind= Shops, required = True)
+	code = ndb.StringProperty(required = True)
+
+	@classmethod
+	def verify_shop(self,urlstring):
+		query = Verification.query().fetch()
+		for q in query:
+			if str(q.code) == str(urlstring):
+				shop = q.shop.get()	
+				print "DEBUG ", shop
+				shop.verified = True
+				shop.put()
+				q.key.delete()
+
+	@classmethod
+	def new_pending_shop(self,_shop):
+		#Expects valid shop entity.
+		_code = utils.generate_string(size= 20)
+		entity = Verification(shop = _shop.key, code = _code)
+		entity.put()
+		utils.email_verification(_shop,_code)
+
+

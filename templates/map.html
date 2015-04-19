@@ -35,9 +35,15 @@
 // The user can then click an option to hide, show or delete the markers.
 var map;
 var cordinates = [];
-{%for cordinate in cordinates%}
-cordinates.push(new google.maps.LatLng({{cordinate[0]}},{{cordinate[1]}}));
-{%endfor%}
+cordinates.push(new google.maps.LatLng({{lat}},{{lon}}));
+var temp = [];
+temp.push("{{fname}}{{lname}}");
+{%for shop in shops%}
+cordinates.push(new google.maps.LatLng({{shop[0].location.lat}},{{shop[0].location.lon}}));
+temp.push("<b> {{shop[0].shop_name}} </b><br> {{shop[0].shop_address}} <br> Call on - {{shop[0].mobile}} <br> Recommendation Index = {{shop[1]}}");
+  {%endfor%}
+
+
 var trip=cordinates;
 var markers = [];
 function initialize() {
@@ -48,27 +54,28 @@ function initialize() {
   };
   map = new google.maps.Map(document.getElementById('map-canvas'),
       mapOptions);
-   var infowindow = new google.maps.InfoWindow({
-    content: "shop addres"
-  });
-  //infowindow.open(map,marker);
+  //infowindowopen(map,marker);
   //This event listener will call addMarker() when the map is clicked.
   //google.maps.event.addListener(map, 'click', function(event) {
    // addMarker(event.latLng);
   //});
-
-  for(var i=0;i<trip.length;i++){
-    addMarker(trip[i]);
+  
+  for(var i=0;i<=trip.length;i++){
+    addMarker(trip[i],i);
   }
   // Adds a marker at the center of the map.
   //addMarker(haightAshbury);
 }
 // Add a marker to the map and push to the array.
-function addMarker(location) {
+function addMarker(location,i) {
   var marker = new google.maps.Marker({
     position: location,
     map: map
   });
+  var infowindow = new google.maps.InfoWindow({
+    content: temp[i]
+  });
+  infowindow.open(map,marker);
   markers.push(marker);
 }
 // Sets the map on all markers in the array.
@@ -112,7 +119,7 @@ font-size: 16px;"> <a href="/logout?url=/" class="btn btn-danger square-btn-adju
 
                     {%for shop in shops%}
                     <li>
-                        <a  href="/shopprofile/{{shop[0].key.urlsafe()}}">{{shop[0].shop_name}} <em> {{shop[1]}} </em> <span class="glyphicon glyphicon-menu-right" aria-hidden="true"> </span></a>
+                        <a  href="/shop/shopprofile/{{shop[0].key.id()}}">{{shop[0].shop_name}} <em> {{shop[1]}} </em> <span class="glyphicon glyphicon-menu-right" aria-hidden="true"> </span></a>
                     </li>
                     {%endfor%}
 
@@ -125,7 +132,7 @@ font-size: 16px;"> <a href="/logout?url=/" class="btn btn-danger square-btn-adju
 </div>
       <div id="map-canvas"></div>
       <input name = "shop cordinates" type = "hidden">
-      <p>Click on the map to add markers.</p>
+    
 
 
 

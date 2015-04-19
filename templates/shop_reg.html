@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html>
-	
+
 <head>
 	<title>Store Locator - Register</title>
 		<meta charset="utf-8">
@@ -15,57 +15,137 @@
 		<!--//webfonts-->
 </head>
 <body>
-	
+
 				 <!-----start-main---->
 				<div class="registration-form">
 					<div class="head">
 						<img src="" alt=""/>
-						
+
 					</div>
-				
+
 
 				<div class="login-06">
 					<div class="fourth-login">
 					<form class="four" method="post">
+
+						{% if fname %}
 						<div class="green">
 							<input type="text" class="text" value="{{fname}}" placeholder = "First Name" name="fname" >
 						</div>
+						{% else %}
+						<div class="green">
+							<input type="text" class="text" placeholder = "First Name" name="fname" >
+						</div>
+						{% endif %}
+						{% if error_fname %}
+							<div class="alert alert-warning" role="alert">
+							<span class="sr-only">Error:</span>
+									{{error_fname}}
+								</div>
+						{% endif %}
+
+						{%if lname %}
 						<div class="green">
 							<input type="text" class="text" value="{{lname}}" placeholder = "Last Name" name="lname" >
 						</div>
-						
+						{% else %}
+						<div class="green">
+							<input type="text" class="text" placeholder = "Last Name" name="lname" >
+						</div>
+						{%endif%}
+						{%if error_lname %}
+							<div class="alert alert-warning" role="alert">
+							<span class="sr-only">Error:</span>
+									{{error_lname}}
+								</div>
+						{%endif%}
+
+						{%if shop_name %}
 						<div class="block">
 							<input type="text" class="text green2" value="{{shop_name}}" placeholder = "Shop Name" name="shop_name" >
 						</div>
+						{%else %}
+						<div class="block">
+							<input type="text" class="text green2" placeholder = "Shop Name" name="shop_name" >
+						</div>
+						{%endif%}
+						{%if error_name%}
+							<div class="alert alert-warning" role="alert">
+							<span class="sr-only">Error:</span>
+									{{error_name}}
+								</div>
+						{%endif%}
+
+						{%if shop_add %}
 						<div class="block">
 							<input type="text" class="text green2" value="{{shop_add}}" placeholder = "Shop Address" name="shop_add" >
 						</div>
+						{%else%}
+						<div class="block">
+							<input type="text" class="text green2" placeholder = "Shop Address" name="shop_add" >
+						</div>
+						{%endif%}
+						{%if error_address%}
+							<div class="alert alert-warning" role="alert">
+							<span class="sr-only">Error:</span>
+									{{error_address}}
+								</div>
+						{%endif%}
 
+						{%if email%}
 						<div class="green">
 							<input type="text" class="text" value="{{email}}" placeholder = "Email Address" name="email" >
 						</div>
+						{%else%}
 						<div class="green">
+							<input type="text" class="text" placeholder = "Email Address" name="email" >
+						</div>
+						{%endif%}
+						{%if error_email%}
+							<div class="alert alert-warning" role="alert">
+							<span class="sr-only">Error:</span>
+									{{error_email}}
+								</div>
+						{%endif%}
 
+						{%if mobile%}
+						<div class="green">
 							<input type="text" class="text" value="{{mobile}}" placeholder = "Mobile Number" name="mobile" >
 						</div>
+						{% else %}
+						<div class="green">
+							<input type="text" class="text" placeholder = "Mobile Number" name="mobile" >
+						</div>
+						{%endif%}
+						{%if error_mobile%}
+							<div class="alert alert-warning" role="alert">
+							<span class="sr-only">Error:</span>
+									{{error_mobile}}
+								</div>
+						{%endif%}
 
-						
+
 						<div class="block">
 							<input type="password" placeholder = "Password" class="text" name="pwd" >
 						</div>
 						<div class="block">
 							<input type="password" placeholder = "Re-enter Password"  class="text" name="crpwd" >
 						</div>
+						{%if error_password%}
+							<div class="alert alert-warning" role="alert">
+							<span class="sr-only">Error:</span>
+									{{error_password}}
+								</div>
+						{%endif%}
 
-							<input onclick="myFunction()" value="SIGN UP" type="submit"> 
-
-						{%if error%}	
+						<input onclick="myFunction()" value="SIGN UP" type="submit">
+						{%if error%}
 							<div class="alert alert-warning" role="alert">
 							<span class="sr-only">Error:</span>
 			  					{{error}}
 			  				</div>
 						{%endif%}
-						
+
 						</form>
 						</div>
 						</div>
