@@ -11,6 +11,11 @@ from fuzzywuzzy import fuzz 		#For better search
 class Categories(ndb.Model):
 	name = ndb.StringProperty(required = True)
 	children = ndb.StringProperty(repeated = True)
+	deleted = ndb.BooleanProperty()
+	timestamp = ndb.DateTimeProperty(auto_now=True)
+
+	def _post_put_hook(self, future):
+		print future
 
 	@classmethod
 	def populate(self):
@@ -22,6 +27,7 @@ class Categories(ndb.Model):
 				entity = Categories(name = _name, children = _children)
 			else:
 				entity = Categories(name = _name)
+			entity.deleted = False
 			entity.put()
 
 	@classmethod
