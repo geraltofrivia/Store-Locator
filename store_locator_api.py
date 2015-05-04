@@ -2,7 +2,7 @@ import endpoints
 from protorpc import messages
 from protorpc import message_types
 from protorpc import remote
-from datastore import Users, Categories, Products
+from datastore import Shops, Categories, Products
 from google.appengine.ext import ndb
 from collections import defaultdict
 from datetime import datetime
@@ -15,22 +15,24 @@ class LoginResponseType(messages.Enum):
   NOT_FOUND = 2
   WRONG_PASSWORD = 3
 
-class UserRequestAuthentication(messages.Message):
+class ShopkeeperRequestAuthentication(messages.Message):
   email = messages.StringField(1, required=True)
   password = messages.StringField(2, required=True)
 
-class UserField(messages.Message):
+class ShopkeeperField(messages.Message):
   fname = messages.StringField(1)
   lname = messages.StringField(2)
   email = messages.StringField(3)
   id = messages.IntegerField(4)
-  phone = messages.StringField(5)
+  mobile = messages.IntegerField(5)
+  shop_name = messages.StringField(6)
+  shop_address = messages.StringField(7)
 
-class UserResponseAuthentication(messages.Message):
+class ShopkeeperResponseAuthentication(messages.Message):
   status = messages.EnumField(LoginResponseType, 1)
-  userInformation = messages.MessageField(UserField, 2)
+  shopkeeperInformation = messages.MessageField(ShopkeeperField, 2)
 
-class UserReponseBoolean(messages.Message):
+class ShopkeeperReponseBoolean(messages.Message):
   status = messages.BooleanField(1)
   id = messages.IntegerField(2)
 
@@ -93,52 +95,68 @@ def parse_timestamp(timestamp):
 @endpoints.api(name='storelocator', version='v1', allowed_client_ids=['148827402385-m8tetu1vf8o2snnjtii5s2p4dif7e3uu.apps.googleusercontent.com'])
 class StoreLocatorAPI(remote.Service):
 
-  @endpoints.method(UserRequestAuthentication, UserResponseAuthentication,
+  @endpoints.method(ShopkeeperRequestAuthentication, ShopkeeperResponseAuthentication,
                     path="login", http_method='POST',
-                    name='greetings.userAuthentication')
-  def check_user_authentication(self, request):
+                    name='greetings.shopkeeperAuthentication')
+  def check_shopkeeper_authentication(self, request):
     try:
       statusMessage = LoginResponseType.NONE
-      query = Users.query(Users.email == request.email).fetch() 
+      query = Shops.query(Shops.email == request.email).fetch() 
       if len(query) == 0:
         statusMessage = LoginResponseType.NOT_FOUND
       elif query[0].password != request.password:
         statusMessage = LoginResponseType.WRONG_PASSWORD
       else:
         statusMessage = LoginResponseType.LOGIN
-        userField = UserField(fname = query[0].fname,
+        shopkeeperField = ShopkeeperField(fname = query[0].fname,
                               lname = query[0].lname,
                               id = query[0].key.id(),
-                              #TODO: add phone field in datastore
-                              # phone = query[0].phone
+                              mobile = query[0].mobile,
+                              shop_name = query[0].shop_name,
+                              shop_address = query[0].shop_address,
                               email = query[0].email)
-        return UserResponseAuthentication(status = statusMessage, userInformation = userField)
-      return UserResponseAuthentication(status=statusMessage)
+        return ShopkeeperResponseAuthentication(status = statusMessage, shopkeeperInformation = shopkeeperField)
+      return ShopkeeperResponseAuthentication(status=statusMessage)
     except(TypeError):
       raise endpoints.NotFoundException('Error in the input format')
 
-  @endpoints.method(UserField, UserReponseBoolean,
-                    path="user", http_method='POST',
-                    name='greetings.userProfileUpdate')
-  def user_profile_update(self, request):
-    #TODO: Add phone field here
-    #TODO: handle error here
-    currentUser = ndb.Key("Users", request.id).get()
-    currentUser.fname = request.fname
-    currentUser.lname = request.lname
-    currentUser.email = request.email
-    currentUser.put();
-    return UserReponseBoolean(status=True)
+  @endpoints.method(ShopkeeperField, ShopkeeperReponseBoolean,
+                    path="shopkeeper", http_method='POST',
+                    name='greetings.shopkeeperProfileUpdate')
+  def shopkeeper_profile_update(self, request):
+    currentShopkeeper = ndb.Key("Shops", request.id).get()
+    currentShopkeeper.fname = request.fname
+    currentShopkeeper.lname = request.lname
+    currentShopkeeper.mobile = request.mobile
+    currentShopkeeper.shop_name = request.shop_name
+    currentShopkeeper.shop_address = request.shop_address
+    currentShopkeeper.put();
+    return ShopkeeperReponseBoolean(status=True)
 
-  @endpoints.method(UserRequestAuthentication, UserReponseBoolean,
+  SHOPKEEPER_REQUEST = endpoints.ResourceContainer(message_types.VoidMessage,
+      id=messages.IntegerField(1))
+  @endpoints.method(SHOPKEEPER_REQUEST, ShopkeeperField,
+                    path="shopkeeper", http_method='GET',
+                    name='greetings.getShopkeeperProfile')
+  def get_shopkeeper_profile(self, request):
+    currentShopkeeper = ndb.Key("Shops", request.id).get()
+    return ShopkeeperField(fname=currentShopkeeper.fname,
+                    id=request.id,
+                    lname=currentShopkeeper.lname,
+                    mobile=currentShopkeeper.mobile,
+                    email=currentShopkeeper.email,
+                    shop_address=currentShopkeeper.shop_address,
+                    shop_name=currentShopkeeper.shop_name)
+
+  @endpoints.method(ShopkeeperRequestAuthentication, ShopkeeperReponseBoolean,
                     path="register", http_method='PUT',
                     name='greetings.register')
-  def register_user(self, request):
-      if len(Users.query(Users.email == request.email).fetch()) == 0:
-        id = Users(email=request.email, password=request.password).put().get().key.id()
-        return UserReponseBoolean(status=True, id=id)
+  def register_shopkeeper(self, request):
+      if len(Shops.query(Shops.email == request.email).fetch()) == 0:
+        id = Shops(email=request.email, password=request.password).put().get().key.id()
+        return ShopkeeperReponseBoolean(status=True, id=id)
       else:
-        return UserReponseBoolean(status=False)
+        return ShopkeeperReponseBoolean(status=False)
 
   LIST_REQUEST = endpoints.ResourceContainer(
     message_types.VoidMessage,
