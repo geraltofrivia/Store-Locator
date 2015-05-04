@@ -6,6 +6,8 @@ import string
 import datetime
 import math
 
+from google.appengine.api import mail
+
 def verify_name(name):
 	'''	Expected string inputs.
 	   	Returns 
@@ -14,7 +16,7 @@ def verify_name(name):
 		Will do HTML escaping on it.'''
 	escaped_name = str(cgi.escape(name,quote="True"))
 	if not escaped_name.isalpha():
-		return ('-1','Name Contains invalid characters')
+		return ('-1','invalid name')
 	else:
 		return (name,'Success')
 
@@ -32,30 +34,47 @@ def verify_email(email):
 
 def verify_passwords(pwd,cpwd):
 	if pwd == cpwd:
-		if len(pwd) >= 8:
+		if len(pwd) >= 6:
+			hasint = False
+			haschar = False
+			pwd = str(pwd)
+			for char in pwd:
+				if str.isdigit(char):
+					hasint = True
+				if str.isalpha(char):
+					haschar = True
+			if not hasint:
+				return ('-1','Please include atleast one digit as well')
+			if not haschar:
+				return ('-1','Please include atleast one char as well')
 			return (pwd,'Success')
 		else:
-			return ('-1','Password too short!')
+			return ('-1','Password should contain minimum 6 characters!')
 	else:
 		return ('-1','Passwords do not match')
 
 def verify_mobile(mobile):
 	#expects string
 	print "utils: verify_mobile: ", mobile
+	mobile = str(mobile)
+	if len(mobile) < 10:
+		return ('-1',"Mobile number too short")
 	try:
 		mobile = int(mobile)
 	except:
 		print "utils: verify_mobile: mobile number is not integer ", mobile
 
-	if mobile.__class__ == int(3).__class__:
+	if mobile.__class__ == int(9999999999).__class__:
 		#successfully converted to integer
 		return (mobile,'Success')
 
 	else:
-		return ('-1',"Mobile number is a number")
+		return ('-1',"Mobile number should be a number")
 
 def verify_text(text):
-	return (text,'Success')
+	if len(text) < 1:
+		return ('-1','Please enter some text')
+	return (str(cgi.escape(text,quote="True")),'Success')
 
 def verify_location(latitiude,longitude):
 	try:
@@ -186,3 +205,39 @@ def distance_on_unit_sphere(lat1, long1, lat2, long2):
     # Remember to multiply arc by the radius of the earth 
     # in your favorite set of units to get length.
     return arc*6371.0
+
+def email_verification(shop,code):
+	print "utils: emailverification: ",shop.shop_name,code
+	
+	mail.send_mail(sender= "store-locatr@appspot.gserviceaccount.com",
+	              to= shop.email,
+	              subject= "Account Verification",
+	              body= """
+
+	Dear %(name)s:
+
+	Your store-locatr.appspot.com account is pending approval. For security purposes, your shop would not be shown to any user till you verify it.
+	Should you choose to not do that at this point of time, you are advised to archive this email someplace retrievable and access the link given below later. 
+	Till then you can set up your shop profile without any hinderances.
+
+	Please visit this link to verify your shop now - http://store-locatr.appspot.com/shop/verify?code=%(code)s
+
+	After doing that, you can sign in and make your profile visible to the entire internet audience.
+	
+	Please let us know if you have any questions.
+	
+	Following are the details of your shop.
+	Shop Name -  %(shopname)s
+	Shopkeeper Name - %(shopkeeper)s
+	Shop Address - %(shopaddress)s
+
+	If you did not reigster the above yourself, please ignore this mail and get on with your life.
+	Alternatively you can always register to store-locatr.appspot.com/shop to make your retail store visible to a larger audience.
+	And if you don't have a retail store, might as well take a step ahead and open one. Everyone needs their daily sugar afterall. 
+		Once you complete that, do register your store with us.
+
+	Regards
+	Store Locator
+	""" % {'name' : shop.fname, 'shopname' : shop.shop_name, 'shopkeeper' : shop.fname, 'shopaddress' : shop.shop_address, 'code': code} ) 
+
+	print "Mail sent"

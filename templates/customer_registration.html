@@ -6,8 +6,8 @@ License URL: http://creativecommons.org/licenses/by/3.0/
 -->
 <!DOCTYPE html>
 <html>
-    
-	
+
+
 <head>
 	<title>Store Locator - Register</title>
 		<meta charset="utf-8">
@@ -22,48 +22,102 @@ License URL: http://creativecommons.org/licenses/by/3.0/
 		<!--//webfonts-->
 </head>
 <body>
-	
+
 				 <!-----start-main---->
 				<div class="registration-form">
 					<div class="head">
 						<img src="" alt=""/>
-						
-					</div>
-				
 
+					</div>
+
+					
 				<div class="login-06">
 					<div class="fourth-login">
+						<div >
+                        <a href="/" style="font-size: 30px;
+                            font-weight: 600;
+                            color: #8CC739;
+                            display: inline-block;
+                            width: 60%;
+                            font-family: "Oswald",sans-serif;
+                            cursor: pointer;
+                            border: medium none;
+                            outline: medium none;">Home</a>
+                    </div>
 					<form class="four" method="post">
-						<div class="green">
+						{% if fname %}
+						<div class="green" >
 							<input type="text" class="text" value="{{fname}}" placeholder = "First Name" name="fname" >
 						</div>
+						{%else%}
+						<div class="green">
+							<input type="text" class="text" placeholder = "First Name" name="fname" >
+						</div>
+						{%endif%}
+            {%if error_fname%}
+              <div class="alert alert-warning" role="alert">
+              <span class="sr-only">Error:</span>
+                  {{error_fname}}
+                </div>
+            {%endif%}
+
+						{%if lname%}
 						<div class="green">
 							<input type="text" class="text" value="{{lname}}" placeholder = "Last Name" name="lname" >
 						</div>
-						
-						
+						{%else%}
+						<div class="green">
+							<input type="text" class="text" value="{{lname}}" placeholder = "Last Name" name="lname" >
+						</div>
+						{%endif%}
+            {%if error_lname%}
+              <div class="alert alert-warning" role="alert">
+              <span class="sr-only">Error:</span>
+                  {{error_lname}}
+                </div>
+            {%endif%}
 
+						{%if email%}
 						<div class="green">
 							<input type="text" class="text" value="{{email}}" placeholder = "Email Address" name="email" >
 						</div>
-												
+						{%else%}
+						<div class="green">
+							<input type="text" class="text" value="{{email}}" placeholder = "Email Address" name="email" >
+						</div>
+						{%endif%}
+            {%if error_email%}
+              <div class="alert alert-warning" role="alert">
+              <span class="sr-only">Error:</span>
+                  {{error_email}}
+                </div>
+            {%endif%}
+
+
 						<div class="block">
 							<input type="password" placeholder = "Password" class="text" name="pwd" >
 						</div>
+
 						<div class="block">
 							<input type="password" placeholder = "Re-enter Password"  class="text" name="crpwd" >
 						</div>
+            {%if error%}
+              <div class="alert alert-warning" role="alert">
+              <span class="sr-only">Error:</span>
+                  {{error_password}}
+                </div>
+            {%endif%}
 
-							<input onclick="myFunction()" value="SIGN UP" type="submit"> 
+							<input onclick="myFunction()" value="SIGN UP" type="submit">
 
-						{%if error%}	
+						{%if error%}
 							<div class="alert alert-warning" role="alert">
 							<span class="sr-only">Error:</span>
 			  					{{error}}
 			  				</div>
 						{%endif%}
-						
+
 						</form>
-	
+
 </body>
 </html>

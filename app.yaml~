@@ -1,5 +1,5 @@
 application: store-locatr
-version: 10
+version: 4
 runtime: python27
 api_version: 1
 threadsafe: true

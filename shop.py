@@ -3,6 +3,7 @@ import cgi
 import datetime
 import jinja2
 import webapp2
+import cgi
 
 import datastore		#Our databases
 import utils			#Misc utility class
@@ -145,13 +146,13 @@ class RegistrationPage(Handler):
 		_shop_name=self.request.get('shop_name')
 		_shop_address=self.request.get('shop_add')
 
-		_fname,error = utils.verify_name(_fname)
-		_lname,error = utils.verify_name(_lname)
-		_email,error = utils.verify_email(_email)
-		_password,error = utils.verify_passwords(_password,_c_password)
-		_mobile,error = utils.verify_mobile(_mobile)
-		_shop_name,error = utils.verify_text(_shop_name)
-		_shop_address,error = utils.verify_text(_shop_address)
+		_fname,error_fname = utils.verify_name(_fname)
+		_lname,error_lname = utils.verify_name(_lname)
+		_email,error_email = utils.verify_email(_email)
+		_password,error_password = utils.verify_passwords(_password,_c_password)
+		_mobile,error_mobile = utils.verify_mobile(_mobile)
+		_shop_name,error_name = utils.verify_text(_shop_name)
+		_shop_address,error_address = utils.verify_text(_shop_address)
 
 		print "/registration-post: fname", _fname
 		print "/registration-post: lname", _lname
@@ -163,18 +164,40 @@ class RegistrationPage(Handler):
 
 		if _fname != '-1' and _lname != '-1' and _email != '-1' and _password != '-1' and _mobile != '-1' and _shop_address != '-1' and _shop_name != '-1':
 			register_status,error = datastore.Shops.register(_email,_fname,_lname,_password,_mobile,_shop_name,_shop_address)
-			print "/registration-post: ", register_status
+			if error == 'Success':
+				print "/registration-post: ", register_status
+			else:
+				self.render("shop_reg.html", error = "This email id is already in use", fname = _fname, lname = _lname, email = _email, mobile = _mobile, shop_name = _shop_name, shop_add = _shop_address)
 		else:
 			print "/registration-post: incorrect inputs"
-			print "/registration-post: fname", _fname
-			print "/registration-post: lname", _lname
-			print "/registration-post: email", _email
-			print "/registration-post: mobile", _mobile
-			print "/registration-post: shopname", _shop_name
-			print "/registration-post: shopaddress", _shop_address
-			print "/registration-post: password", _password
+			if error_fname == 'Success':
+				error_fname = None
+			else:
+				_fname = None
+			if error_lname == 'Success':
+				error_lname = None
+			else:
+				_lname = None
+			if error_email == 'Success':
+				error_email = None
+			else:
+				_email = None
+			if error_password == 'Success':
+				error_password = None
+			if error_mobile == 'Success':
+				error_mobile = None
+			else:
+				_mobile = None
+			if error_name == 'Success':
+				error_name = None
+			else:
+				shop_name = None
+			if error_address == 'Success':
+				error_address = None
+			else:
+				shop_address =  None
 
-			self.render("shop_reg.html", error = error, fname = _fname, lname = _lname, email = _email, mobile = _mobile, shop_name = _shop_name, shop_add = _shop_address)
+			self.render("shop_reg.html", error = error, fname = _fname, lname = _lname, email = _email, mobile = _mobile, shop_name = _shop_name, shop_add = _shop_address, error_fname = error_fname, error_lname = error_lname, error_email = error_email, error_name = error_name, error_mobile = error_mobile, error_password = error_password, error_address = error_address)
 			return
 
 		print "/registration-post: successfully registered"
@@ -219,7 +242,23 @@ class ProfilePage(Handler):
 				c = p.category.get()
 				products.append((p,c))
 				#print products
-			self.render("shop_profile.html", shopname = _shop.shop_name.upper(), fname = _shop.fname, products = products)
+			a = 'False'
+			if _shop.open:
+				a = 'True'
+			
+			if _shop.verified:
+				error_verified = None
+			else:
+				error_verified = "Please verify your profile, by clicking on the link providied in the email to your ID."
+
+			if not _shop.location:
+				error_location = "Please input the location of your shop. Without this data, your shop would not show up in search results"
+			else:
+				error_location = None
+
+
+			self.render("shop_profile.html", shopname = _shop.shop_name.upper(), fname = _shop.fname, products = products, open=a, error_verified = error_verified, error_location = error_location)
+
 		else:
 			print "profile-get: no shop found in cookies"
 			self.redirect("/shop/")
@@ -252,13 +291,15 @@ class ProfilePage(Handler):
 			self.redirect("/shop/profile")
 		else:
 			self.redirect("/shop/")
-			
+
 class Infopage(Handler):
 	def get(self):
 		_shop = self.check_cookies(self)
 		if _shop != -1:
 			print "profile-get: found shop", _shop
-			self.render("shop_info.html" ,fname=_shop.fname,lname=_shop.lname,email=_shop.email,mobile=_shop.mobile,add=_shop.shop_address,_shopname=_shop.shop_name,shopname = _shop.shop_name.upper())
+			
+			print utils.verify_text(_shop.shop_address)[0]
+			self.render("shop_info.html" ,fname=_shop.fname,lname=_shop.lname ,email=_shop.email,mobile=_shop.mobile,add=utils.verify_text(_shop.shop_address)[0],_shopname=_shop.shop_name,shopname = _shop.shop_name.upper())
 		else:
 			self.redirect("/shop/")
 
@@ -269,8 +310,8 @@ class Infopage(Handler):
 			_lname=utils.verify_name(self.request.get('lname'))[0]
 			_email=utils.verify_email(self.request.get('email'))[0]
 			_mobile=utils.verify_mobile(self.request.get('mobile'))[0]
-			_shop_name=utils.verify_name(self.request.get('shop_name'))[0]
-			_shop_address=utils.verify_name(self.request.get('shop_add'))[0]
+			_shop_name=utils.verify_text(self.request.get('shop_name'))[0]
+			_shop_address=utils.verify_text(self.request.get('shop_add'))[0]
 
 			datastore.Shops.update_info(_fname, _lname, _email, _mobile, _shop_name, _shop_address, _shop)
 			self.redirect("/shop/profile")
@@ -366,19 +407,28 @@ class InventoryAdditionPage(Handler):
 			except:
 				print "add-shopping: post: length is not a number", length
 				print "add-shopping: post: length -", length
+			print length	
+			if length==0:
+			    self.redirect("/shop/profile")
+			    return	
 
 			if length.__class__ == int('1').__class__ :
 				#Surely length is a valid length and we have products list and a valid user.
 				#It doesnt
+				count=0;
 				products = []
 				for i in range(length):
 					key = self.request.get('%s' % i)
 					if key:
 						products.append(key)
+						count=count+1
 						print "add-shopping: post: finding product ids: ", key
 						datastore.Shops.add_product(key,_shop.key.id())
 						print "add-shopping: post: products: ", products
 						self.redirect("/shop/profile")
+				if count==0:
+				    self.redirect("/shop/profile")		
+					
 		else:
 			self.redirect("/shop/")
 
@@ -442,12 +492,16 @@ class PasswordChange(Handler):
 
 			_new_pass = utils.verify_passwords(_new_pass,_cnew_pass)[0]
 			if not _new_pass == '-1':
-				if datastore.Shops.update_password(_old_pass,_new_pass,_shop):
-					self.redirect("/shop/profile?msg=Password_successfully_changed",shopname=_shop.shop_name.upper(),fname=_shop.fname,lname=_shop.lname)
+				print "new enter"
+				
+				if (datastore.Shops.update_password(_old_pass,_new_pass,_shop))	:
+					print _shop.shop_name.upper()
+					self.redirect("/shop/profile?msg=Password_successfully_changed")
+					return
 				else:
 					self.render("shop_password.html", error = "Wrong password entered",shopname=_shop.shop_name.upper(),fname=_shop.fname,lname=_shop.lname)
 			else:
-				self.render("shop_password.html", error = "Passwords do not match",shopname=_shop.shop_name.upper(),fname=_shop.fname,lname=_shop.lname)
+				self.render("shop_password.html", error = "Passwords do not match or invalid entry",shopname=_shop.shop_name.upper(),fname=_shop.fname,lname=_shop.lname)
 		else:
 			self.redirect("/shop/")
 
@@ -458,6 +512,49 @@ class LogoutPage(Handler):
 		self.check_cookies(self,logout = True)
 		self.redirect(url)
 
+class ShopProfile(Handler):
+	def get(self, url):
+		print url
+		_shop=datastore.Shops.fetch_by_id(str(url))
+		if _shop:
+			if _shop.verified:
+				products = []
+				for product in _shop.inventory:
+					p = product.get()
+					c = p.category.get()
+					products.append((p,c))
+				self.render("shop_view_cust.html",fname=_shop.fname,lname=_shop.lname,email=_shop.email,add=_shop.shop_address,shopname=_shop.shop_name,mobile=_shop.mobile,products = products, lat = _shop.location.lat, lon = _shop.location.lon)
+			else:
+				self.redirect('/shop/')
+		else:
+			self.redirect('/shop/#login')
+			
+class ShopOpenClose(Handler):
+	def get(self):
+		_shop = self.check_cookies(self)
+		if _shop != -1:
+			value = self.request.get('switch')
+			print "shopopenclose: get: ", value
+			if str(value) == 'open':
+				datastore.Shops.open_shop(_shop)
+			elif str(value) == 'close':
+				datastore.Shops.close_shop(_shop)
+		self.redirect('/shop/#login')
+
+class VerifyShop(Handler):
+	def get(self):
+		randstring = self.request.get('code')
+		print randstring
+		if randstring:
+			datastore.Verification.verify_shop(str(randstring))
+		self.redirect("/shop/#login")
+
+class Temp(Handler):
+	def get(self):
+		_shop = self.check_cookies(self)
+		if _shop != -1:
+			utils.email_verification(_shop,'11L24HG7UHMJ5LVD0J6D')
+
 application = webapp2.WSGIApplication([('/shop/registration',RegistrationPage),
 									 ('/shop/register',RegistrationPage),
 									 ('/shop/profile',ProfilePage),
@@ -467,5 +564,9 @@ application = webapp2.WSGIApplication([('/shop/registration',RegistrationPage),
 									 ('/shop/logout',LogoutPage),
 									 ('/shop/editinfo',Infopage),
 									 ('/shop/updatepassword',PasswordChange),
-									 ('/shop/',MainPage)
+									 ('/shop/shopprofile/(\d+)',ShopProfile),
+									 ('/shop/openclose',ShopOpenClose),
+									 ('/shop/',MainPage),
+									 ('/shop/verify',VerifyShop),
+									 ('/shop/temp',Temp)
 									 ], debug=True)
